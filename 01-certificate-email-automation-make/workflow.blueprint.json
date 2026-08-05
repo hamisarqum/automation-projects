@@ -1,0 +1,1067 @@
+{
+  "name": "Automated Certificate Generation and Email Delivery",
+  "flow": [
+    {
+      "id": 2,
+      "module": "google-sheets:filterRows",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "from": "drive",
+        "limit": "1",
+        "sheetId": "Awardees",
+        "sortOrder": "asc",
+        "spreadsheetId": "REPLACE_WITH_SPREADSHEET_ID",
+        "tableFirstRow": "A1:Z1",
+        "includesHeaders": true,
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING"
+      },
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        },
+        "restore": {
+          "expect": {
+            "from": {
+              "label": "Select from My Drive"
+            },
+            "orderBy": {
+              "mode": "chose"
+            },
+            "sheetId": {
+              "mode": "chose",
+              "label": "Awardees"
+            },
+            "sortOrder": {
+              "mode": "chose",
+              "label": "Ascending"
+            },
+            "spreadsheetId": {
+              "mode": "chose",
+              "label": "Awardee_Certificate_Tracker"
+            },
+            "tableFirstRow": {
+              "label": "A-Z"
+            },
+            "includesHeaders": {
+              "mode": "chose",
+              "label": "Yes"
+            },
+            "valueRenderOption": {
+              "mode": "chose",
+              "label": "Formatted value"
+            },
+            "dateTimeRenderOption": {
+              "mode": "chose",
+              "label": "Formatted string"
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "Configure connection after import"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "from",
+            "type": "select",
+            "label": "Search Method",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share"
+              ]
+            }
+          },
+          {
+            "name": "valueRenderOption",
+            "type": "select",
+            "label": "Value render option",
+            "validate": {
+              "enum": [
+                "FORMATTED_VALUE",
+                "UNFORMATTED_VALUE",
+                "FORMULA"
+              ]
+            }
+          },
+          {
+            "name": "dateTimeRenderOption",
+            "type": "select",
+            "label": "Date and time render option",
+            "validate": {
+              "enum": [
+                "SERIAL_NUMBER",
+                "FORMATTED_STRING"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "type": "uinteger",
+            "label": "Limit"
+          },
+          {
+            "name": "spreadsheetId",
+            "type": "select",
+            "label": "Spreadsheet Name",
+            "required": true
+          },
+          {
+            "name": "sheetId",
+            "type": "select",
+            "label": "Sheet Name",
+            "required": true
+          },
+          {
+            "name": "includesHeaders",
+            "type": "select",
+            "label": "Table contains headers",
+            "required": true,
+            "validate": {
+              "enum": [
+                true,
+                false
+              ]
+            }
+          },
+          {
+            "name": "tableFirstRow",
+            "type": "select",
+            "label": "Column range",
+            "required": true,
+            "validate": {
+              "enum": [
+                "A1:Z1",
+                "A1:BZ1",
+                "A1:CZ1",
+                "A1:DZ1",
+                "A1:MZ1",
+                "A1:ZZ1",
+                "A1:AZZ1",
+                "A1:BZZ1",
+                "A1:CZZ1",
+                "A1:DZZ1",
+                "A1:MZZ1",
+                "A1:ZZZ1"
+              ]
+            }
+          },
+          {
+            "name": "filter",
+            "type": "filter",
+            "label": "Filter",
+            "options": "rpc://google-sheets/2/rpcGetFilterKeys?includesHeaders=true"
+          },
+          {
+            "name": "orderBy",
+            "type": "select",
+            "label": "Order by"
+          },
+          {
+            "name": "sortOrder",
+            "type": "select",
+            "label": "Sort order",
+            "validate": {
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "interface": [
+          {
+            "name": "__IMTLENGTH__",
+            "type": "uinteger",
+            "label": "Total number of bundles"
+          },
+          {
+            "name": "__IMTINDEX__",
+            "type": "uinteger",
+            "label": "Bundle order position"
+          },
+          {
+            "name": "__ROW_NUMBER__",
+            "type": "number",
+            "label": "Row number"
+          },
+          {
+            "name": "__SPREADSHEET_ID__",
+            "type": "text",
+            "label": "Spreadsheet ID"
+          },
+          {
+            "name": "__SHEET__",
+            "type": "text",
+            "label": "Sheet"
+          },
+          {
+            "name": "0",
+            "type": "text",
+            "label": "Awardee Name (A)"
+          },
+          {
+            "name": "1",
+            "type": "text",
+            "label": "Certificate Date (B)"
+          },
+          {
+            "name": "2",
+            "type": "text",
+            "label": "Email ID (C)"
+          },
+          {
+            "name": "3",
+            "type": "text",
+            "label": "Status (D)"
+          },
+          {
+            "name": "4",
+            "type": "text",
+            "label": "(E)"
+          },
+          {
+            "name": "5",
+            "type": "text",
+            "label": "(F)"
+          },
+          {
+            "name": "6",
+            "type": "text",
+            "label": "(G)"
+          },
+          {
+            "name": "7",
+            "type": "text",
+            "label": "(H)"
+          },
+          {
+            "name": "8",
+            "type": "text",
+            "label": "(I)"
+          },
+          {
+            "name": "9",
+            "type": "text",
+            "label": "(J)"
+          },
+          {
+            "name": "10",
+            "type": "text",
+            "label": "(K)"
+          },
+          {
+            "name": "11",
+            "type": "text",
+            "label": "(L)"
+          },
+          {
+            "name": "12",
+            "type": "text",
+            "label": "(M)"
+          },
+          {
+            "name": "13",
+            "type": "text",
+            "label": "(N)"
+          },
+          {
+            "name": "14",
+            "type": "text",
+            "label": "(O)"
+          },
+          {
+            "name": "15",
+            "type": "text",
+            "label": "(P)"
+          },
+          {
+            "name": "16",
+            "type": "text",
+            "label": "(Q)"
+          },
+          {
+            "name": "17",
+            "type": "text",
+            "label": "(R)"
+          },
+          {
+            "name": "18",
+            "type": "text",
+            "label": "(S)"
+          },
+          {
+            "name": "19",
+            "type": "text",
+            "label": "(T)"
+          },
+          {
+            "name": "20",
+            "type": "text",
+            "label": "(U)"
+          },
+          {
+            "name": "21",
+            "type": "text",
+            "label": "(V)"
+          },
+          {
+            "name": "22",
+            "type": "text",
+            "label": "(W)"
+          },
+          {
+            "name": "23",
+            "type": "text",
+            "label": "(X)"
+          },
+          {
+            "name": "24",
+            "type": "text",
+            "label": "(Y)"
+          },
+          {
+            "name": "25",
+            "type": "text",
+            "label": "(Z)"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "google-slides:createPresentation",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "from": "drive",
+        "title": "{{2.`0`}} -{{2.`1`}}",
+        "select": "value",
+        "shared": false,
+        "folderId": "/REPLACE_WITH_DRIVE_FOLDER_ID/REPLACE_WITH_OUTPUT_FOLDER_ID",
+        "requests": {
+          "Date": "{{2.`1`}}",
+          "Name": "{{2.`0`}}",
+          "email": "{{2.`2`}}"
+        },
+        "destination": "drive",
+        "presentation": "/REPLACE_WITH_DRIVE_FOLDER_ID/REPLACE_WITH_SLIDES_TEMPLATE_ID"
+      },
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0
+        },
+        "restore": {
+          "expect": {
+            "from": {
+              "label": "My Drive"
+            },
+            "select": {
+              "label": "By Dropdown"
+            },
+            "shared": {
+              "mode": "chose"
+            },
+            "folderId": {
+              "mode": "chose",
+              "path": [
+                "Make.com",
+                "certificates"
+              ]
+            },
+            "destination": {
+              "label": "My Drive"
+            },
+            "presentation": {
+              "path": [
+                "Make.com",
+                "certificate"
+              ]
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "Configure connection after import"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "required": true
+          },
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Copy a Presentation",
+            "required": true,
+            "validate": {
+              "enum": [
+                "map",
+                "value"
+              ]
+            }
+          },
+          {
+            "name": "destination",
+            "type": "select",
+            "label": "New Drive Location",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "shared",
+            "type": "boolean",
+            "label": "Shared",
+            "required": true
+          },
+          {
+            "name": "from",
+            "type": "select",
+            "label": "Choose a Drive",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "presentation",
+            "type": "file",
+            "label": "Presentation ID",
+            "required": true
+          },
+          {
+            "name": "requests",
+            "spec": [
+              {
+                "name": "Name",
+                "type": "text"
+              },
+              {
+                "name": "email",
+                "type": "text"
+              },
+              {
+                "name": "Date",
+                "type": "text"
+              }
+            ],
+            "type": "collection",
+            "label": "Values"
+          },
+          {
+            "name": "folderId",
+            "type": "folder",
+            "label": "New Document's Location"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "module": "google-email:sendAnEmail",
+      "version": 4,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "to": [
+          "{{2.`2`}}"
+        ],
+        "subject": "{{2.`0`}}- certificate on {{2.`1`}}",
+        "bodyType": "collection",
+        "attachments": [
+          {
+            "data": "{{3.id}}",
+            "filename": "{{3.title}}"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 600,
+          "y": 0
+        },
+        "restore": {
+          "expect": {
+            "cc": {
+              "mode": "chose"
+            },
+            "to": {
+              "mode": "chose",
+              "items": [
+                null
+              ]
+            },
+            "bcc": {
+              "mode": "chose"
+            },
+            "from": {
+              "mode": "chose"
+            },
+            "bodyType": {
+              "label": "Collection of contents (text, images, etc.)"
+            },
+            "contents": {
+              "mode": "chose"
+            },
+            "signature": {
+              "mode": "chose"
+            },
+            "attachments": {
+              "mode": "chose",
+              "items": [
+                null
+              ]
+            },
+            "emailHeaders": {
+              "mode": "chose"
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google-email"
+              },
+              "label": "Configure connection after import"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google-email",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "to",
+            "spec": {
+              "name": "value",
+              "type": "email",
+              "label": "Recipient email address",
+              "required": true,
+              "validate": true
+            },
+            "type": "array",
+            "label": "To",
+            "required": true
+          },
+          {
+            "name": "subject",
+            "type": "text",
+            "label": "Subject"
+          },
+          {
+            "name": "bodyType",
+            "type": "select",
+            "label": "Body type",
+            "required": true,
+            "validate": {
+              "enum": [
+                "rawHtml",
+                "collection"
+              ]
+            }
+          },
+          {
+            "name": "attachments",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "filename",
+                  "type": "filename",
+                  "label": "File name",
+                  "required": true,
+                  "semantic": "file:name"
+                },
+                {
+                  "name": "data",
+                  "type": "buffer",
+                  "label": "Data",
+                  "required": true,
+                  "semantic": "file:data"
+                }
+              ],
+              "type": "collection",
+              "label": "Attachment"
+            },
+            "type": "array",
+            "label": "Attachments"
+          },
+          {
+            "name": "from",
+            "type": "select",
+            "label": "From"
+          },
+          {
+            "name": "cc",
+            "spec": {
+              "name": "value",
+              "type": "email",
+              "label": "Recipient email address"
+            },
+            "type": "array",
+            "label": "CC recipients"
+          },
+          {
+            "name": "bcc",
+            "spec": {
+              "name": "value",
+              "type": "email",
+              "label": "Recipient email address"
+            },
+            "type": "array",
+            "label": "BCC recipients"
+          },
+          {
+            "name": "emailHeaders",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "key",
+                  "type": "text",
+                  "label": "Key",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "text",
+                  "label": "Value"
+                }
+              ],
+              "type": "collection",
+              "label": "Email header"
+            },
+            "type": "array",
+            "label": "Additional email headers"
+          },
+          {
+            "name": "contents",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "text",
+                  "type": "text",
+                  "label": "Text"
+                },
+                {
+                  "name": "image",
+                  "spec": [
+                    {
+                      "name": "filename",
+                      "type": "filename",
+                      "label": "File name",
+                      "semantic": "file:name"
+                    },
+                    {
+                      "name": "data",
+                      "type": "buffer",
+                      "label": "Data",
+                      "semantic": "file:data"
+                    },
+                    {
+                      "name": "width",
+                      "type": "uinteger",
+                      "label": "Width"
+                    },
+                    {
+                      "name": "height",
+                      "type": "uinteger",
+                      "label": "Height"
+                    }
+                  ],
+                  "type": "collection",
+                  "label": "Image"
+                }
+              ],
+              "type": "collection",
+              "label": "Content"
+            },
+            "type": "array",
+            "label": "Body contents"
+          },
+          {
+            "name": "signature",
+            "type": "select",
+            "label": "Signature content"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "module": "google-sheets:updateRow",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "from": "drive",
+        "mode": "select",
+        "values": {
+          "2": "email sent"
+        },
+        "sheetId": "Awardees",
+        "rowNumber": "{{2.`__ROW_NUMBER__`}}",
+        "spreadsheetId": "/REPLACE_WITH_DRIVE_FOLDER_ID/REPLACE_WITH_SPREADSHEET_ID",
+        "includesHeaders": true,
+        "useColumnHeaders": false,
+        "valueInputOption": "USER_ENTERED"
+      },
+      "metadata": {
+        "designer": {
+          "x": 900,
+          "y": 0
+        },
+        "restore": {
+          "expect": {
+            "from": {
+              "label": "My Drive"
+            },
+            "mode": {
+              "label": "Search by path"
+            },
+            "sheetId": {
+              "label": "Awardees"
+            },
+            "spreadsheetId": {
+              "path": [
+                "Make.com",
+                "Awardee_Certificate_Tracker"
+              ]
+            },
+            "includesHeaders": {
+              "label": "Yes"
+            },
+            "useColumnHeaders": {
+              "label": "No"
+            },
+            "valueInputOption": {
+              "mode": "chose",
+              "label": "User entered"
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "Configure connection after import"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "mode",
+            "type": "select",
+            "label": "Search Method",
+            "required": true,
+            "validate": {
+              "enum": [
+                "select",
+                "fromAll",
+                "map"
+              ]
+            }
+          },
+          {
+            "name": "valueInputOption",
+            "type": "select",
+            "label": "Value input option",
+            "validate": {
+              "enum": [
+                "USER_ENTERED",
+                "RAW"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "type": "select",
+            "label": "Drive",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "spreadsheetId",
+            "type": "file",
+            "label": "Spreadsheet Name",
+            "required": true
+          },
+          {
+            "name": "sheetId",
+            "type": "select",
+            "label": "Sheet Name",
+            "required": true
+          },
+          {
+            "name": "rowNumber",
+            "type": "uinteger",
+            "label": "Row number",
+            "required": true
+          },
+          {
+            "name": "includesHeaders",
+            "type": "select",
+            "label": "Table contains headers",
+            "required": true,
+            "validate": {
+              "enum": [
+                true,
+                false
+              ]
+            }
+          },
+          {
+            "name": "useColumnHeaders",
+            "type": "select",
+            "label": "Use column headers as IDs of the columns",
+            "required": true,
+            "validate": {
+              "enum": [
+                true,
+                false
+              ]
+            }
+          },
+          {
+            "name": "values",
+            "spec": [
+              {
+                "name": "0",
+                "type": "text",
+                "label": "Awardee Name (A)"
+              },
+              {
+                "name": "1",
+                "type": "text",
+                "label": "Certificate Date (B)"
+              },
+              {
+                "name": "2",
+                "type": "text",
+                "label": "Email ID (C)"
+              },
+              {
+                "name": "3",
+                "type": "text",
+                "label": "Status (D)"
+              },
+              {
+                "name": "4",
+                "type": "text",
+                "label": "(E)"
+              },
+              {
+                "name": "5",
+                "type": "text",
+                "label": "(F)"
+              },
+              {
+                "name": "6",
+                "type": "text",
+                "label": "(G)"
+              },
+              {
+                "name": "7",
+                "type": "text",
+                "label": "(H)"
+              },
+              {
+                "name": "8",
+                "type": "text",
+                "label": "(I)"
+              },
+              {
+                "name": "9",
+                "type": "text",
+                "label": "(J)"
+              },
+              {
+                "name": "10",
+                "type": "text",
+                "label": "(K)"
+              },
+              {
+                "name": "11",
+                "type": "text",
+                "label": "(L)"
+              },
+              {
+                "name": "12",
+                "type": "text",
+                "label": "(M)"
+              },
+              {
+                "name": "13",
+                "type": "text",
+                "label": "(N)"
+              },
+              {
+                "name": "14",
+                "type": "text",
+                "label": "(O)"
+              },
+              {
+                "name": "15",
+                "type": "text",
+                "label": "(P)"
+              },
+              {
+                "name": "16",
+                "type": "text",
+                "label": "(Q)"
+              },
+              {
+                "name": "17",
+                "type": "text",
+                "label": "(R)"
+              },
+              {
+                "name": "18",
+                "type": "text",
+                "label": "(S)"
+              },
+              {
+                "name": "19",
+                "type": "text",
+                "label": "(T)"
+              },
+              {
+                "name": "20",
+                "type": "text",
+                "label": "(U)"
+              },
+              {
+                "name": "21",
+                "type": "text",
+                "label": "(V)"
+              },
+              {
+                "name": "22",
+                "type": "text",
+                "label": "(W)"
+              },
+              {
+                "name": "23",
+                "type": "text",
+                "label": "(X)"
+              },
+              {
+                "name": "24",
+                "type": "text",
+                "label": "(Y)"
+              },
+              {
+                "name": "25",
+                "type": "text",
+                "label": "(Z)"
+              }
+            ],
+            "type": "collection",
+            "label": "Values in columns",
+            "metadata": [
+              [
+                [
+                  "Awardee Name",
+                  "Certificate Date",
+                  "Email ID",
+                  "Status"
+                ]
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "slots": null,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu2.make.com",
+    "notes": []
+  }
+}

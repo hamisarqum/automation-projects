@@ -1,0 +1,27 @@
+UPLOAD TO GITHUB
+
+Recommended repository name:
+automation-projects
+
+Option 1: GitHub website
+
+1. Open GitHub and create a new empty repository named automation-projects.
+2. Do not initialize it with another README because this package already includes one.
+3. Extract automation-projects-github-ready.zip.
+4. Open the new repository.
+5. Select Add file, then Upload files.
+6. Drag all contents from the extracted automation-projects folder into the upload area.
+7. Use this commit message:
+   Add automation workflow portfolio
+8. Commit the changes.
+
+Option 2: Git command line
+
+git clone https://github.com/ariamalmohsen-git/automation-projects.git
+cd automation-projects
+
+Copy all prepared files into this folder, then run:
+
+git add .
+git commit -m "Add automation workflow portfolio"
+git push origin main

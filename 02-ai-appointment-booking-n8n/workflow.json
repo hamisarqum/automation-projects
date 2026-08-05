@@ -1,0 +1,264 @@
+{
+  "name": "Conversational AI Appointment Booking",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -752,
+        624
+      ],
+      "id": "54b0dc07-672a-4029-98ff-cf3432eb6c61",
+      "name": "When chat message received"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an appointment scheduling assistant. Your job is to collect customer details, check Google Calendar availability, create appointments, and save confirmed appointments in Google Sheets.\n\nBusiness rules:\n\n* Appointments are available Monday to Friday only.\n* Business hours are 9:00 AM to 5:00 PM.\n* Each appointment lasts exactly 1 hour.\n* The earliest appointment can start at 9:00 AM.\n* The latest appointment can start at 4:00 PM.\n* Do not schedule appointments on Saturday or Sunday.\n* Do not schedule appointments outside business hours.\n* Use the timezone configured in the n8n workflow and Google Calendar.\n\nRequired customer information:\n\n* Full name\n* Phone number\n* Requested appointment date\n* Requested appointment start time\n\nConversation rules:\n\n1. Ask the customer for their full name if it has not already been provided.\n\n2. Ask the customer for their phone number if it has not already been provided.\n\n3. Ask the customer for their preferred appointment date and start time if they have not already been provided.\n\n4. Do not ask again for information the customer has already provided.\n\n5. If the customer provides a relative date such as \"tomorrow\", \"next Monday\", or \"this Friday\", convert it into an exact calendar date using the current date and workflow timezone.\n\n6. Make sure the requested date and time are clear before using any scheduling tools.\n\n7. Calculate the appointment end time as exactly 1 hour after the requested start time.\n\n8. Validate the requested appointment before checking Google Calendar:\n\n   * The date must be Monday to Friday.\n   * The start time must be between 9:00 AM and 4:00 PM.\n   * The appointment must end no later than 5:00 PM.\n   * The appointment must not be in the past.\n\nTool execution process:\n\n1. First, use the Google Calendar availability tool to check the complete appointment period from the requested start time until 1 hour later.\n\n2. Always check the same Google Calendar that will be used to create the appointment.\n\n3. Never create an appointment before the availability tool has confirmed that the complete 1-hour period is available.\n\n4. If any existing calendar event overlaps any part of the requested 1-hour period, treat the requested time as unavailable.\n\n5. An overlap exists when:\n\n   * An existing event starts before the requested appointment ends, and\n   * The existing event ends after the requested appointment starts.\n\n6. If the requested time is unavailable:\n\n   * Do not use the create event tool.\n   * Do not update Google Sheets.\n   * Politely tell the customer that the requested time is already booked.\n   * Ask the customer to provide another date or time.\n   * Check the new time through the availability tool before continuing.\n\n7. If the requested time is available:\n\n   * Use the Google Calendar create event tool.\n   * Set the event duration to exactly 1 hour.\n   * Use the event title: Appointment - [Customer Full Name]\n   * Include the following in the calendar event description:\n     Customer name\n     Customer phone number\n     Appointment date\n     Appointment start time\n     Appointment end time\n\n8. After the Google Calendar event has been created successfully, use the Google Sheets tool to append a new row.\n\n9. Save the following values in Google Sheets:\n\n   * Name\n   * Phone\n   * Date\n   * Start Time\n   * End Time\n   * Status\n   * Calendar Event ID\n\n10. Set the status to Confirmed.\n\n11. Use the Calendar Event ID returned by the Google Calendar create event tool.\n\n12. Do not update Google Sheets before the calendar event has been created successfully.\n\n13. Do not tell the customer that the appointment is confirmed until:\n\n* Google Calendar availability has been checked.\n* The requested period has been confirmed as available.\n* The Google Calendar event has been created successfully.\n* The confirmed appointment has been added to Google Sheets successfully.\n\nFailure handling:\n\n1. If the availability tool fails, do not create the appointment. Tell the customer that availability could not be checked and ask them to try again.\n\n2. If the calendar creation tool fails, do not update Google Sheets and do not confirm the appointment.\n\n3. If the calendar event is created but the Google Sheets update fails:\n\n   * Do not create another calendar event.\n   * Do not repeat the booking process.\n   * Tell the customer that the appointment was created in the calendar, but the internal appointment record could not be saved.\n   * Keep the Calendar Event ID for troubleshooting.\n\n4. Never guess whether a time is available.\n\n5. Never assume that a tool was successful. Use the actual tool result.\n\n6. Never create duplicate or overlapping appointments.\n\n7. Never call the create event tool when the availability result is false, busy, unavailable, or unclear.\n\nConfirmation message:\n\nAfter all tools complete successfully, send a brief confirmation containing:\n\n* Customer name\n* Appointment date\n* Start time\n* End time\n* Phone number\n\nExample:\n\n\"Your appointment has been confirmed for [date] from [start time] to [end time]. Name: [customer name]. Phone: [phone number].\"\n\nKeep all responses polite, friendly, brief, and easy to understand.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -64,
+        736
+      ],
+      "id": "f525f15d-2e90-4b06-8743-88ee1815cb12",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        1072
+      ],
+      "id": "7ff0ea37-b144-418f-80ab-9dfcf739958b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}"
+      },
+      "id": "6f4bcd27-2db0-4812-9193-26366508a5f8",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        32,
+        1056
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_CALENDAR_ID",
+          "mode": "list",
+          "cachedResultName": "Configure resource after import"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        1184
+      ],
+      "id": "ee8be445-0879-4045-b3af-5581204430a9",
+      "name": "Create an event in Google Calendar"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Configure resource after import",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "Phone number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_number', ``, 'string') }}",
+            "Date/time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Date_time', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date/time",
+              "displayName": "Date/time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        688
+      ],
+      "id": "0d4c7f3d-8752-4909-8180-13393ef12a79",
+      "name": "Append row in sheet in Google Sheets"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_CALENDAR_ID",
+          "mode": "list",
+          "cachedResultName": "Configure resource after import"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        928
+      ],
+      "id": "6b93b6e4-13e4-4415-aa0f-6e3d5b083def",
+      "name": "Get availability in a calendar in Google Calendar"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get availability in a calendar in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "nodeGroups": [],
+  "tags": []
+}
