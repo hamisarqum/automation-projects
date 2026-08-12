@@ -4,3 +4,14 @@
 *.log
 .DS_Store
 Thumbs.db
+
+# Local workflow platform state
+.n8n/
+
+# Credentials and secret exports
+credentials/
+secrets/
+credentials*.json
+secrets*.json
+*.pem
+*.key
