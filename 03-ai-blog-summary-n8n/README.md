@@ -2,7 +2,7 @@
 
 ## Overview
 
-This n8n workflow reads article links from Google Sheets, sends them to an AI agent for structured analysis, and writes blog-style summaries back to Google Sheets.
+This n8n workflow demonstrates trigger-based AI content analysis using article links from Google Sheets. It sends each link into a structured analysis prompt and writes the generated blog-style output back to Google Sheets.
 
 ## Workflow
 
@@ -12,7 +12,7 @@ This n8n workflow reads article links from Google Sheets, sends them to an AI ag
 4. Generate a short image prompt related to the article.
 5. Append the generated output to a blog sheet.
 
-## Required services
+## Required Services
 
 - n8n
 - OpenAI
@@ -22,12 +22,17 @@ This n8n workflow reads article links from Google Sheets, sends them to an AI ag
 
 1. Import `workflow.json` into n8n.
 2. Configure OpenAI and Google Sheets credentials.
-3. Replace the spreadsheet placeholder.
+3. Replace `REPLACE_WITH_SPREADSHEET_ID`.
 4. Select the source and destination sheets.
-5. Confirm the output mapping in the destination Google Sheets node.
-6. Choose either the sheet trigger, schedule trigger, or a controlled combination.
-7. Test with articles that are publicly accessible.
+5. Configure a supported method for retrieving article content from each URL.
+6. Map the generated AI output into the destination `Blogs` column.
+7. Choose either the sheet trigger, schedule trigger, or a controlled combination.
+8. Test with publicly accessible articles before activation.
 
-## Important review
+## Current Export Note
 
-Confirm that the AI agent has a supported method for retrieving article content from each URL. Also verify that the generated output is mapped into the destination `Blogs` column before activation.
+The current workflow sends the article URL to the AI agent but does **not** include a dedicated HTTP request, scraping, or article-content extraction tool. A language model should not be assumed to have automatically read the linked webpage.
+
+Before production use, add a content-retrieval step and pass the retrieved article text into the analysis prompt. Also confirm that the AI output is explicitly mapped into the destination Google Sheets column.
+
+The spreadsheet resource is represented by a placeholder, and no usable account credentials are included in the public export.
